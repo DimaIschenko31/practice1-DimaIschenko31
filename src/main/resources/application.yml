@@ -6,12 +6,14 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://host/database # Додайте власний HOST та базу даних
-    username: user # додайте власний логін
-    password: password # додайте власний пароль
+    url: jdbc:postgresql://dpg-d050bvbe5dus738p6gcg-a.oregon-postgres.render.com/db_postgres_86tg
+    username: db_postgres_86tg_user
+    password: vhIk0yvKowTsaqHpWah8a6piGdX7e6Oe
     driverClassName: org.postgresql.Driver
   sql:
     init:
       platform: postgres
+
