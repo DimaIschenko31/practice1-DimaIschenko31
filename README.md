@@ -148,17 +148,17 @@ spring:
 Система розроблена відповідно до **варіанту 12** курсової роботи.
 
 # Посилання на розгорнутий проект
-http://localhost:8080/api/clients
+* http://localhost:8080/api/clients
 
-http://localhost:8080/api/mechanics
+* http://localhost:8080/api/mechanics
 
-http://localhost:8080/api/service-types
+* http://localhost:8080/api/service-types
 
-http://localhost:8080/api/cars/1/service-records
+* http://localhost:8080/api/cars/1/service-records
 
-http://localhost:8080/api/cars/1/total-service-amount
+* http://localhost:8080/api/cars/1/total-service-amount
 
-http://localhost:8080/api/service-types/popular
+* http://localhost:8080/api/service-types/popular
 
 
-* **Іщенко Дмитрот** 
+ **Іщенко Дмитро** 
