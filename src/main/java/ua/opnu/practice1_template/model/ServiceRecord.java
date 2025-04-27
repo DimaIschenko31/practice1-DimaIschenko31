@@ -4,13 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "service_records")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,14 +17,12 @@ public class ServiceRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "car_id")
-    @JsonBackReference("car-service")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
-    @ManyToOne
-    @JoinColumn(name = "mechanic_id")
-    @JsonBackReference("mechanic-service")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mechanic_id", nullable = false)
     private Mechanic mechanic;
 
     private LocalDate date;
@@ -38,6 +34,5 @@ public class ServiceRecord {
             joinColumns = @JoinColumn(name = "service_record_id"),
             inverseJoinColumns = @JoinColumn(name = "service_type_id")
     )
-    @JsonManagedReference("service-types")
     private List<ServiceType> serviceTypes;
 }

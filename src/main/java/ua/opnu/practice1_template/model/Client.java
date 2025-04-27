@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "clients")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +20,6 @@ public class Client {
     private String phone;
     private String email;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    @JsonManagedReference("client-car")
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Car> cars;
 }

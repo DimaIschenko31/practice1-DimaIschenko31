@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
+@Table(name = "service_types")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +21,5 @@ public class ServiceType {
     private BigDecimal standardPrice;
 
     @ManyToMany(mappedBy = "serviceTypes")
-    @JsonBackReference("service-types")
     private List<ServiceRecord> serviceRecords;
 }

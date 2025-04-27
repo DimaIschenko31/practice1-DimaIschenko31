@@ -1,37 +1,47 @@
 package ua.opnu.practice1_template.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.opnu.practice1_template.model.Client;
+import ua.opnu.practice1_template.dto.ClientDto;
 import ua.opnu.practice1_template.service.ClientService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/clients")
-@RequiredArgsConstructor
 public class ClientController {
+
     private final ClientService clientService;
 
+    @Autowired
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
+
     @PostMapping
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
-        return ResponseEntity.ok(clientService.createClient(client));
+    public ResponseEntity<ClientDto> createClient(@RequestBody ClientDto clientDto) {
+        ClientDto createdClient = clientService.createClient(clientDto);
+        return new ResponseEntity<>(createdClient, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients() {
-        return ResponseEntity.ok(clientService.getAllClients());
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        List<ClientDto> clients = clientService.getAllClients();
+        return ResponseEntity.ok(clients);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.getClientById(id));
+    public ResponseEntity<ClientDto> getClientById(@PathVariable Long id) {
+        ClientDto client = clientService.getClientById(id);
+        return ResponseEntity.ok(client);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client client) {
-        return ResponseEntity.ok(clientService.updateClient(id, client));
+    public ResponseEntity<ClientDto> updateClient(@PathVariable Long id, @RequestBody ClientDto clientDto) {
+        ClientDto updatedClient = clientService.updateClient(id, clientDto);
+        return ResponseEntity.ok(updatedClient);
     }
 
     @DeleteMapping("/{id}")

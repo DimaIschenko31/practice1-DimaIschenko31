@@ -1,39 +1,76 @@
 package ua.opnu.practice1_template.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.opnu.practice1_template.dto.ClientDto;
+import ua.opnu.practice1_template.exception.ResourceNotFoundException;
 import ua.opnu.practice1_template.model.Client;
 import ua.opnu.practice1_template.repository.ClientRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ClientService {
+
     private final ClientRepository clientRepository;
 
-    public Client createClient(Client client) {
-        return clientRepository.save(client);
+    @Autowired
+    public ClientService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
     }
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public ClientDto createClient(ClientDto clientDto) {
+        Client client = convertToEntity(clientDto);
+        Client savedClient = clientRepository.save(client);
+        return convertToDto(savedClient);
     }
 
-    public Client getClientById(Long id) {
-        return clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client not found with id: " + id));
+    public List<ClientDto> getAllClients() {
+        return clientRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    public Client updateClient(Long id, Client clientDetails) {
-        Client client = getClientById(id);
-        client.setName(clientDetails.getName());
-        client.setPhone(clientDetails.getPhone());
-        client.setEmail(clientDetails.getEmail());
-        return clientRepository.save(client);
+    public ClientDto getClientById(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + id));
+        return convertToDto(client);
+    }
+
+    public ClientDto updateClient(Long id, ClientDto clientDto) {
+        Client existingClient = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + id));
+
+        existingClient.setName(clientDto.getName());
+        existingClient.setPhone(clientDto.getPhone());
+        existingClient.setEmail(clientDto.getEmail());
+
+        Client updatedClient = clientRepository.save(existingClient);
+        return convertToDto(updatedClient);
     }
 
     public void deleteClient(Long id) {
-        clientRepository.deleteById(id);
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + id));
+        clientRepository.delete(client);
+    }
+
+    private Client convertToEntity(ClientDto clientDto) {
+        Client client = new Client();
+        client.setId(clientDto.getId());
+        client.setName(clientDto.getName());
+        client.setPhone(clientDto.getPhone());
+        client.setEmail(clientDto.getEmail());
+        return client;
+    }
+
+    private ClientDto convertToDto(Client client) {
+        return new ClientDto(
+                client.getId(),
+                client.getName(),
+                client.getPhone(),
+                client.getEmail()
+        );
     }
 }

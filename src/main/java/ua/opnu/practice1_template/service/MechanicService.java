@@ -1,53 +1,90 @@
 package ua.opnu.practice1_template.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.opnu.practice1_template.dto.MechanicDto;
+import ua.opnu.practice1_template.dto.MechanicStatisticDto;
+import ua.opnu.practice1_template.exception.ResourceNotFoundException;
 import ua.opnu.practice1_template.model.Mechanic;
-import ua.opnu.practice1_template.model.ServiceRecord;
 import ua.opnu.practice1_template.repository.MechanicRepository;
 import ua.opnu.practice1_template.repository.ServiceRecordRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MechanicService {
+
     private final MechanicRepository mechanicRepository;
     private final ServiceRecordRepository serviceRecordRepository;
 
-    public Mechanic createMechanic(Mechanic mechanic) {
-        return mechanicRepository.save(mechanic);
+    @Autowired
+    public MechanicService(MechanicRepository mechanicRepository, ServiceRecordRepository serviceRecordRepository) {
+        this.mechanicRepository = mechanicRepository;
+        this.serviceRecordRepository = serviceRecordRepository;
     }
 
-    public List<Mechanic> getAllMechanics() {
-        return mechanicRepository.findAll();
+    public MechanicDto createMechanic(MechanicDto mechanicDto) {
+        Mechanic mechanic = convertToEntity(mechanicDto);
+        Mechanic savedMechanic = mechanicRepository.save(mechanic);
+        return convertToDto(savedMechanic);
     }
 
-    public Mechanic getMechanicById(Long id) {
-        return mechanicRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mechanic not found with id: " + id));
+    public List<MechanicDto> getAllMechanics() {
+        return mechanicRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    public Mechanic updateMechanic(Long id, Mechanic mechanicDetails) {
-        Mechanic mechanic = getMechanicById(id);
-        mechanic.setName(mechanicDetails.getName());
-        mechanic.setSpecialization(mechanicDetails.getSpecialization());
-        return mechanicRepository.save(mechanic);
+    public MechanicDto getMechanicById(Long id) {
+        Mechanic mechanic = mechanicRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mechanic not found with id: " + id));
+        return convertToDto(mechanic);
+    }
+
+    public MechanicDto updateMechanic(Long id, MechanicDto mechanicDto) {
+        Mechanic existingMechanic = mechanicRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mechanic not found with id: " + id));
+
+        existingMechanic.setName(mechanicDto.getName());
+        existingMechanic.setSpecialization(mechanicDto.getSpecialization());
+
+        Mechanic updatedMechanic = mechanicRepository.save(existingMechanic);
+        return convertToDto(updatedMechanic);
     }
 
     public void deleteMechanic(Long id) {
-        mechanicRepository.deleteById(id);
+        Mechanic mechanic = mechanicRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mechanic not found with id: " + id));
+        mechanicRepository.delete(mechanic);
     }
 
-    public Map<String, Object> getMechanicStatistics(Long mechanicId) {
-        List<ServiceRecord> records = serviceRecordRepository.findByMechanicId(mechanicId);
-        Map<String, Object> statistics = new HashMap<>();
+    public MechanicStatisticDto getMechanicStatistics(Long id) {
+        Mechanic mechanic = mechanicRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mechanic not found with id: " + id));
 
-        statistics.put("totalServices", records.size());
-        statistics.put("serviceRecords", records);
+        Long servicesCount = serviceRecordRepository.countServicesByMechanic(id);
 
-        return statistics;
+        return new MechanicStatisticDto(
+                mechanic.getId(),
+                mechanic.getName(),
+                servicesCount
+        );
+    }
+
+    private Mechanic convertToEntity(MechanicDto mechanicDto) {
+        Mechanic mechanic = new Mechanic();
+        mechanic.setId(mechanicDto.getId());
+        mechanic.setName(mechanicDto.getName());
+        mechanic.setSpecialization(mechanicDto.getSpecialization());
+        return mechanic;
+    }
+
+    private MechanicDto convertToDto(Mechanic mechanic) {
+        return new MechanicDto(
+                mechanic.getId(),
+                mechanic.getName(),
+                mechanic.getSpecialization()
+        );
     }
 }

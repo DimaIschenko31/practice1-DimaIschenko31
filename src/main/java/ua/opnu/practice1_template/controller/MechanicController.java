@@ -1,38 +1,48 @@
 package ua.opnu.practice1_template.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.opnu.practice1_template.model.Mechanic;
+import ua.opnu.practice1_template.dto.MechanicDto;
+import ua.opnu.practice1_template.dto.MechanicStatisticDto;
 import ua.opnu.practice1_template.service.MechanicService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mechanics")
-@RequiredArgsConstructor
 public class MechanicController {
+
     private final MechanicService mechanicService;
 
+    @Autowired
+    public MechanicController(MechanicService mechanicService) {
+        this.mechanicService = mechanicService;
+    }
+
     @PostMapping
-    public ResponseEntity<Mechanic> createMechanic(@RequestBody Mechanic mechanic) {
-        return ResponseEntity.ok(mechanicService.createMechanic(mechanic));
+    public ResponseEntity<MechanicDto> createMechanic(@RequestBody MechanicDto mechanicDto) {
+        MechanicDto createdMechanic = mechanicService.createMechanic(mechanicDto);
+        return new ResponseEntity<>(createdMechanic, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Mechanic>> getAllMechanics() {
-        return ResponseEntity.ok(mechanicService.getAllMechanics());
+    public ResponseEntity<List<MechanicDto>> getAllMechanics() {
+        List<MechanicDto> mechanics = mechanicService.getAllMechanics();
+        return ResponseEntity.ok(mechanics);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mechanic> getMechanicById(@PathVariable Long id) {
-        return ResponseEntity.ok(mechanicService.getMechanicById(id));
+    public ResponseEntity<MechanicDto> getMechanicById(@PathVariable Long id) {
+        MechanicDto mechanic = mechanicService.getMechanicById(id);
+        return ResponseEntity.ok(mechanic);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Mechanic> updateMechanic(@PathVariable Long id, @RequestBody Mechanic mechanic) {
-        return ResponseEntity.ok(mechanicService.updateMechanic(id, mechanic));
+    public ResponseEntity<MechanicDto> updateMechanic(@PathVariable Long id, @RequestBody MechanicDto mechanicDto) {
+        MechanicDto updatedMechanic = mechanicService.updateMechanic(id, mechanicDto);
+        return ResponseEntity.ok(updatedMechanic);
     }
 
     @DeleteMapping("/{id}")
@@ -42,7 +52,8 @@ public class MechanicController {
     }
 
     @GetMapping("/{id}/statistics")
-    public ResponseEntity<Map<String, Object>> getMechanicStatistics(@PathVariable Long id) {
-        return ResponseEntity.ok(mechanicService.getMechanicStatistics(id));
+    public ResponseEntity<MechanicStatisticDto> getMechanicStatistics(@PathVariable Long id) {
+        MechanicStatisticDto statistics = mechanicService.getMechanicStatistics(id);
+        return ResponseEntity.ok(statistics);
     }
 }

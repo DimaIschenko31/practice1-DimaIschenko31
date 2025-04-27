@@ -5,10 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "cars")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,9 +16,8 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
-    @JsonBackReference("client-car")
     private Client client;
 
     private String make;
@@ -27,7 +25,6 @@ public class Car {
     private Integer year;
     private String vin;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    @JsonManagedReference("car-service")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceRecord> serviceRecords;
 }

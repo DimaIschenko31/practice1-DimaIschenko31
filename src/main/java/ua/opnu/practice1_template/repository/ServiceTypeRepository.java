@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> {
-    @Query("SELECT st FROM ServiceType st JOIN st.serviceRecords sr GROUP BY st ORDER BY COUNT(sr) DESC")
-    List<ServiceType> findMostPopularServiceTypes();
+    @Query("SELECT st, COUNT(sr) as count FROM ServiceType st JOIN st.serviceRecords sr GROUP BY st ORDER BY count DESC")
+    List<Object[]> findMostPopularServices();
 }

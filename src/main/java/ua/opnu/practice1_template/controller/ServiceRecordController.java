@@ -1,73 +1,81 @@
 package ua.opnu.practice1_template.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.opnu.practice1_template.model.ServiceRecord;
+import ua.opnu.practice1_template.dto.ServiceRecordDto;
 import ua.opnu.practice1_template.service.ServiceRecordService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-@RequiredArgsConstructor
+@RequestMapping("/api/service-records")
 public class ServiceRecordController {
+
     private final ServiceRecordService serviceRecordService;
 
-    @PostMapping("/cars/{carId}/mechanics/{mechanicId}/service-records")
-    public ResponseEntity<ServiceRecord> createServiceRecord(
-            @PathVariable Long carId,
-            @PathVariable Long mechanicId,
-            @RequestBody ServiceRecord serviceRecord) {
-        return ResponseEntity.ok(serviceRecordService.createServiceRecord(carId, mechanicId, serviceRecord));
+    @Autowired
+    public ServiceRecordController(ServiceRecordService serviceRecordService) {
+        this.serviceRecordService = serviceRecordService;
     }
 
-    @GetMapping("/cars/{carId}/service-records")
-    public ResponseEntity<List<ServiceRecord>> getCarServiceRecords(@PathVariable Long carId) {
-        return ResponseEntity.ok(serviceRecordService.getCarServiceRecords(carId));
+    @PostMapping
+    public ResponseEntity<ServiceRecordDto> createServiceRecord(@RequestBody ServiceRecordDto serviceRecordDto) {
+        ServiceRecordDto createdServiceRecord = serviceRecordService.createServiceRecord(serviceRecordDto);
+        return new ResponseEntity<>(createdServiceRecord, HttpStatus.CREATED);
     }
 
-    @GetMapping("/mechanics/{mechanicId}/service-records")
-    public ResponseEntity<List<ServiceRecord>> getMechanicServiceRecords(@PathVariable Long mechanicId) {
-        return ResponseEntity.ok(serviceRecordService.getMechanicServiceRecords(mechanicId));
+    @GetMapping("/car/{carId}")
+    public ResponseEntity<List<ServiceRecordDto>> getServiceRecordsByCarId(@PathVariable Long carId) {
+        List<ServiceRecordDto> serviceRecords = serviceRecordService.getServiceRecordsByCarId(carId);
+        return ResponseEntity.ok(serviceRecords);
     }
 
-    @GetMapping("/service-records/{id}")
-    public ResponseEntity<ServiceRecord> getServiceRecordById(@PathVariable Long id) {
-        return ResponseEntity.ok(serviceRecordService.getServiceRecordById(id));
+    @GetMapping("/mechanic/{mechanicId}")
+    public ResponseEntity<List<ServiceRecordDto>> getServiceRecordsByMechanicId(@PathVariable Long mechanicId) {
+        List<ServiceRecordDto> serviceRecords = serviceRecordService.getServiceRecordsByMechanicId(mechanicId);
+        return ResponseEntity.ok(serviceRecords);
     }
 
-    @PutMapping("/service-records/{id}")
-    public ResponseEntity<ServiceRecord> updateServiceRecord(
-            @PathVariable Long id,
-            @RequestBody ServiceRecord serviceRecord) {
-        return ResponseEntity.ok(serviceRecordService.updateServiceRecord(id, serviceRecord));
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceRecordDto> getServiceRecordById(@PathVariable Long id) {
+        ServiceRecordDto serviceRecord = serviceRecordService.getServiceRecordById(id);
+        return ResponseEntity.ok(serviceRecord);
     }
 
-    @DeleteMapping("/service-records/{id}")
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceRecordDto> updateServiceRecord(@PathVariable Long id, @RequestBody ServiceRecordDto serviceRecordDto) {
+        ServiceRecordDto updatedServiceRecord = serviceRecordService.updateServiceRecord(id, serviceRecordDto);
+        return ResponseEntity.ok(updatedServiceRecord);
+    }
+
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteServiceRecord(@PathVariable Long id) {
         serviceRecordService.deleteServiceRecord(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/service-records/{recordId}/service-types/{typeId}")
-    public ResponseEntity<ServiceRecord> assignServiceTypeToRecord(
-            @PathVariable Long recordId,
-            @PathVariable Long typeId) {
-        return ResponseEntity.ok(serviceRecordService.assignServiceTypeToRecord(recordId, typeId));
+    @PostMapping("/{recordId}/service-types/{typeId}")
+    public ResponseEntity<Void> assignServiceTypeToRecord(@PathVariable Long recordId, @PathVariable Long typeId) {
+        serviceRecordService.assignServiceTypeToRecord(recordId, typeId);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/cars/{carId}/total-service-amount")
-    public ResponseEntity<Long> getTotalServiceAmountForCar(@PathVariable Long carId) {
-        return ResponseEntity.ok(serviceRecordService.getTotalServiceAmountForCar(carId));
+    @GetMapping("/car/{carId}/total-amount")
+    public ResponseEntity<BigDecimal> getTotalServiceAmountForCar(@PathVariable Long carId) {
+        BigDecimal totalAmount = serviceRecordService.getTotalServiceAmountForCar(carId);
+        return ResponseEntity.ok(totalAmount);
     }
 
-    @GetMapping("/service-records/period")
-    public ResponseEntity<List<ServiceRecord>> getServiceRecordsForPeriod(
+    @GetMapping("/period")
+    public ResponseEntity<List<ServiceRecordDto>> getServiceRecordsByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(serviceRecordService.getServiceRecordsForPeriod(startDate, endDate));
+        List<ServiceRecordDto> serviceRecords = serviceRecordService.getServiceRecordsByDateRange(startDate, endDate);
+        return ResponseEntity.ok(serviceRecords);
     }
 }

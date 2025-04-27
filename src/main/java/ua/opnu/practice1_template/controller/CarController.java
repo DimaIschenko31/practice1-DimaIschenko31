@@ -1,47 +1,52 @@
 package ua.opnu.practice1_template.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.opnu.practice1_template.model.Car;
+import ua.opnu.practice1_template.dto.CarDto;
 import ua.opnu.practice1_template.service.CarService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-@RequiredArgsConstructor
+@RequestMapping("/api/cars")
 public class CarController {
+
     private final CarService carService;
 
-    @PostMapping("/clients/{clientId}/cars")
-    public ResponseEntity<Car> addCarToClient(@PathVariable Long clientId, @RequestBody Car car) {
-        return ResponseEntity.ok(carService.addCarToClient(clientId, car));
+    @Autowired
+    public CarController(CarService carService) {
+        this.carService = carService;
     }
 
-    @GetMapping("/clients/{clientId}/cars")
-    public ResponseEntity<List<Car>> getClientCars(@PathVariable Long clientId) {
-        return ResponseEntity.ok(carService.getClientCars(clientId));
+    @PostMapping
+    public ResponseEntity<CarDto> createCar(@RequestBody CarDto carDto) {
+        CarDto createdCar = carService.createCar(carDto);
+        return new ResponseEntity<>(createdCar, HttpStatus.CREATED);
     }
 
-    @GetMapping("/cars/{id}")
-    public ResponseEntity<Car> getCarById(@PathVariable Long id) {
-        return ResponseEntity.ok(carService.getCarById(id));
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<CarDto>> getCarsByClientId(@PathVariable Long clientId) {
+        List<CarDto> cars = carService.getCarsByClientId(clientId);
+        return ResponseEntity.ok(cars);
     }
 
-    @PutMapping("/cars/{id}")
-    public ResponseEntity<Car> updateCar(@PathVariable Long id, @RequestBody Car car) {
-        return ResponseEntity.ok(carService.updateCar(id, car));
+    @GetMapping("/{id}")
+    public ResponseEntity<CarDto> getCarById(@PathVariable Long id) {
+        CarDto car = carService.getCarById(id);
+        return ResponseEntity.ok(car);
     }
 
-    @DeleteMapping("/cars/{id}")
+    @PutMapping("/{id}")
+    public ResponseEntity<CarDto> updateCar(@PathVariable Long id, @RequestBody CarDto carDto) {
+        CarDto updatedCar = carService.updateCar(id, carDto);
+        return ResponseEntity.ok(updatedCar);
+    }
+
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/cars/most-serviced")
-    public ResponseEntity<List<Car>> getCarsWithMostServiceRecords() {
-        return ResponseEntity.ok(carService.getCarsWithMostServiceRecords());
     }
 }
