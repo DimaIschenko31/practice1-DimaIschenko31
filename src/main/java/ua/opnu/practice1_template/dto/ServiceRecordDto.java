@@ -1,10 +1,11 @@
 package ua.opnu.practice1_template.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,5 +17,5 @@ public class ServiceRecordDto {
     private Long mechanicId;
     private LocalDate date;
     private String description;
-    private List<Long> serviceTypeIds;
+    private List<Long> serviceTypeIds = new ArrayList<>();
 }
