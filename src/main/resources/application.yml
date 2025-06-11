@@ -9,11 +9,40 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://dpg-d050bvbe5dus738p6gcg-a.oregon-postgres.render.com/db_postgres_86tg
-    username: db_postgres_86tg_user
-    password: vhIk0yvKowTsaqHpWah8a6piGdX7e6Oe
+    url: jdbc:postgresql://dpg-d11c09ali9vc738kevt0-a.oregon-postgres.render.com:5432/db_postgres2_fpw3
+    username: db_postgres2_fpw3_user
+    password: r3MoiVgnE6PX34S8AyrVu8iEm8OZjpJs
     driverClassName: org.postgresql.Driver
   sql:
     init:
       platform: postgres
 
+  # OAuth2 Configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+            user-name-attribute: email
+
+# JWT Configuration
+jwt:
+  secret: mySecretKeyForAutoServiceManagementSystem2024
+  expiration: 86400000 # 24 hours in milliseconds
+
+# Logging configuration
+logging:
+  level:
+    ua.opnu.practice1_template: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
